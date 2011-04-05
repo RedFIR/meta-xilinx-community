@@ -1,0 +1,104 @@
+From 4201215cf0880b35f769f3a340874a51c2beeebc Mon Sep 17 00:00:00 2001
+From: Adrian Alonso <aalonso00@gmail.com>
+Date: Tue, 5 Oct 2010 23:22:21 -0500
+Subject: [PATCH] gcc: libgcc missing libextra files
+
+* Add crti.s, crtn.s to libextra_parts
+
+Signed-off-by: Adrian Alonso <aalonso00@gmail.com>
+---
+ libgcc/config/microblaze/crti.s |   39 +++++++++++++++++++++++++++++++++++++++
+ libgcc/config/microblaze/crtn.s |   35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 74 insertions(+), 0 deletions(-)
+ create mode 100644 libgcc/config/microblaze/crti.s
+ create mode 100644 libgcc/config/microblaze/crtn.s
+
+diff --git a/libgcc/config/microblaze/crti.s b/libgcc/config/microblaze/crti.s
+new file mode 100644
+index 0000000..3944443
+--- /dev/null
++++ b/libgcc/config/microblaze/crti.s
+@@ -0,0 +1,39 @@
++/* crti.s for __init, __fini
++   This file supplies the prologue for __init and __fini routines 
++
++   Copyright 2009, 2010 Free Software Foundation, Inc.
++
++   Contributed by Michael Eager <eager@eagercon.com>.
++
++   This file is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by the
++   Free Software Foundation; either version 3, or (at your option) any
++   later version.
++ 
++   GCC is distributed in the hope that it will be useful, but WITHOUT
++   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++   License for more details.
++
++   Under Section 7 of GPL version 3, you are granted additional
++   permissions described in the GCC Runtime Library Exception, version
++   3.1, as published by the Free Software Foundation.
++
++   You should have received a copy of the GNU General Public License and
++   a copy of the GCC Runtime Library Exception along with this program;
++   see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++   <http://www.gnu.org/licenses/>.  */
++
++    .section .init, "ax"
++    .global __init
++    .align 2
++__init: 
++    addik   r1, r1, -8
++    sw      r15, r0, r1
++
++    .section .fini, "ax"
++    .global __fini
++    .align 2
++__fini: 
++    addik   r1, r1, -8
++    sw      r15, r0, r1
+diff --git a/libgcc/config/microblaze/crtn.s b/libgcc/config/microblaze/crtn.s
+new file mode 100644
+index 0000000..7970dee
+--- /dev/null
++++ b/libgcc/config/microblaze/crtn.s
+@@ -0,0 +1,35 @@
++/* crtn.s for __init, __fini
++   This file supplies the epilogue for __init and __fini routines 
++
++   Copyright 2009, 2010 Free Software Foundation, Inc.
++
++   Contributed by Michael Eager <eager@eagercon.com>.
++
++   This file is free software; you can redistribute it and/or modify it
++   under the terms of the GNU General Public License as published by the
++   Free Software Foundation; either version 3, or (at your option) any
++   later version.
++ 
++   GCC is distributed in the hope that it will be useful, but WITHOUT
++   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
++   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
++   License for more details.
++
++   Under Section 7 of GPL version 3, you are granted additional
++   permissions described in the GCC Runtime Library Exception, version
++   3.1, as published by the Free Software Foundation.
++
++   You should have received a copy of the GNU General Public License and
++   a copy of the GCC Runtime Library Exception along with this program;
++   see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
++   <http://www.gnu.org/licenses/>.  */
++
++    .section .init, "ax"
++    lw      r15, r0, r1
++    rtsd    r15, 8 
++    addik   r1, r1, 8
++
++    .section .fini, "ax"
++    lw      r15, r0, r1
++    rtsd    r15, 8 
++    addik   r1, r1, 8    
+-- 
+1.7.2.3
+

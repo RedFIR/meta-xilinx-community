@@ -1,0 +1,60 @@
+2010-02-08  Roland McGrath  <roland@redhat.com>
+
+	* config/rs6000/sysv4.h (LINK_EH_SPEC): Pass --no-add-needed to the
+	linker.
+	* config/linux.h (LINK_EH_SPEC): Likewise.
+	* config/alpha/elf.h (LINK_EH_SPEC): Likewise.
+	* config/ia64/linux.h (LINK_EH_SPEC): Likewise.
+
+Index: gcc/config/alpha/elf.h
+===================================================================
+--- gcc/config/alpha/elf.h.orig
++++ gcc/config/alpha/elf.h
+@@ -438,7 +438,7 @@ extern int alpha_this_gpdisp_sequence_nu
+    I imagine that other systems will catch up.  In the meantime, it
+    doesn't harm to make sure that the data exists to be used later.  */
+ #if defined(HAVE_LD_EH_FRAME_HDR)
+-#define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
++#define LINK_EH_SPEC "--no-add-needed %{!static:--eh-frame-hdr} "
+ #endif
+ 
+ /* A C statement (sans semicolon) to output to the stdio stream STREAM
+Index: gcc/config/ia64/linux.h
+===================================================================
+--- gcc/config/ia64/linux.h.orig
++++ gcc/config/ia64/linux.h
+@@ -80,7 +80,7 @@ do {						\
+    Signalize that because we have fde-glibc, we don't need all C shared libs
+    linked against -lgcc_s.  */
+ #undef LINK_EH_SPEC
+-#define LINK_EH_SPEC ""
++#define LINK_EH_SPEC "--no-add-needed "
+ 
+ #define MD_UNWIND_SUPPORT "config/ia64/linux-unwind.h"
+ 
+Index: gcc/config/rs6000/sysv4.h
+===================================================================
+--- gcc/config/rs6000/sysv4.h.orig
++++ gcc/config/rs6000/sysv4.h
+@@ -835,7 +835,7 @@ extern int fixuplabelno;
+   -dynamic-linker " LINUX_DYNAMIC_LINKER "}}"
+ 
+ #if defined(HAVE_LD_EH_FRAME_HDR)
+-# define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
++# define LINK_EH_SPEC "--no-add-needed %{!static:--eh-frame-hdr} "
+ #endif
+ 
+ #define CPP_OS_LINUX_SPEC "-D__unix__ -D__gnu_linux__ -D__linux__ \
+Index: gcc/config/gnu-user.h
+===================================================================
+--- gcc/config/gnu-user.h.orig
++++ gcc/config/gnu-user.h
+@@ -82,7 +82,7 @@ see the files COPYING3 and COPYING.RUNTI
+ #define LIB_SPEC GNU_USER_TARGET_LIB_SPEC
+ 
+ #if defined(HAVE_LD_EH_FRAME_HDR)
+-#define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
++#define LINK_EH_SPEC "--no-add-needed %{!static:--eh-frame-hdr} "
+ #endif
+ 
+ #undef LINK_GCC_C_SEQUENCE_SPEC

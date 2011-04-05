@@ -1,0 +1,32 @@
+From 04153874492400683e00c74b855a6fe7ac081276 Mon Sep 17 00:00:00 2001
+From: Adrian Alonso <aalonso00@gmail.com>
+Date: Mon, 25 Oct 2010 11:57:18 -0500
+Subject: [PATCH 2/2] gcc: libgcc t-microblaze extra_parts
+
+* Add build instruction for crt{i,n}
+
+Signed-off-by: Adrian Alonso <aalonso00@gmail.com>
+---
+ libgcc/config/microblaze/t-microblaze |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
+
+diff --git a/libgcc/config/microblaze/t-microblaze b/libgcc/config/microblaze/t-microblaze
+index 85fc8d3..694f123 100644
+--- a/libgcc/config/microblaze/t-microblaze
++++ b/libgcc/config/microblaze/t-microblaze
+@@ -10,3 +10,12 @@ LIB2ADD += \
+         $(srcdir)/config/microblaze/divsi3_table.c
+ 
+ MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high
++
++# For C++ crstuff
++EXTRA_MULTILIB_PARTS = crtbegin$(objext) crtend$(objext) crti$(objext) crtn$(objext)
++# Build multiple copies of ? crt{i,n}.o, one for each traget switch.
++$(T)crti$(objext): $(srcdir)/config/microblaze/crti.s
++	$(GCC_FOR_TARGET) $(GCC_CFLAGS) $(INCLUDES) $(MULTILIB_CFLAGS) -c $(srcdir)/config/microblaze/crti.s -o $(T)crti$(objext)
++
++$(T)crtn$(objext): $(srcdir)/config/microblaze/crtn.s
++	$(GCC_FOR_TARGET) $(GCC_CFLAGS) $(INCLUDES) $(MULTILIB_CFLAGS) -c $(srcdir)/config/microblaze/crtn.s -o $(T)crtn$(objext)
+-- 
+1.7.2.3
+

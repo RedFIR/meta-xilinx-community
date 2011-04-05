@@ -1,0 +1,19 @@
+2007-10-21  Jakub Jelinek  <jakub@redhat.com>
+
+	* doc/Makefile.am (POD2MAN): Set date from cp-tools.texinfo
+	timestamp rather than from current date.
+	* doc/Makefile.in: Regenerated.
+
+Index: libjava/classpath/doc/Makefile.am
+===================================================================
+--- libjava/classpath/doc/Makefile.am.orig
++++ libjava/classpath/doc/Makefile.am
+@@ -31,7 +31,7 @@ TOOLS_MANFILES = \
+ 	gtnameserv.1 \
+ 	gjdoc.1
+ 
+-POD2MAN = pod2man --center="GNU" --release="$(VERSION)" --date=$(shell sed -n '1s/ .*//p' <$(srcdir)/../ChangeLog)
++POD2MAN = pod2man --center="GNU" --release="$(VERSION)" --date="$(shell ls --time-style=+%F -l $(srcdir)/cp-tools.texinfo | awk '{print $$6}')"
+ TEXI2POD = perl $(srcdir)/texi2pod.pl
+ STAMP = echo timestamp >
+ 

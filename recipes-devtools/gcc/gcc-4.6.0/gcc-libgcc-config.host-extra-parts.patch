@@ -1,0 +1,27 @@
+From 18db4cdc014f40f31087a6b6fee7704e5b369497 Mon Sep 17 00:00:00 2001
+From: Adrian Alonso <aalonso00@gmail.com>
+Date: Mon, 25 Oct 2010 11:56:15 -0500
+Subject: [PATCH 1/2] gcc: libgcc config.host extra parts
+
+Gcc libgcc config.host extra_parts
+
+Signed-off-by: Adrian Alonso <aalonso00@gmail.com>
+---
+ libgcc/config.host |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/libgcc/config.host b/libgcc/config.host
+index eb70215..d0f7ad8 100644
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -404,6 +404,7 @@ mcore-*-pe*)
+ 	;;
+ microblaze*-*-*)
+         tmake_file="microblaze/t-microblaze"
++		extra_parts="$extra_parts crti.o crtn.o"
+ 	;;
+ mips-sgi-irix[56]*)
+ 	;;
+-- 
+1.7.2.3
+
