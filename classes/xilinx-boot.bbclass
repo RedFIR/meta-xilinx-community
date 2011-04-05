@@ -37,7 +37,7 @@ python __anonymous () {
             uboot_target = 'pcc' + target
             uboot_config = 'xilinx-pcc' + cpu + '-generic_config'
     else:
-        uboot_taget = target
+        uboot_target = target
         uboot_config = arch + '-generic_config'
 
     bb.data.setVar('UBOOT_TARGET', uboot_target, d)
