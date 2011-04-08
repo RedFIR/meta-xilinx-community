@@ -1,0 +1,23 @@
+# 006_better_file_error.patch by David Kimdon <dwhedon@gordian.com>
+# Rework patch Adrian Alonso <aalonso@secretlab.ca>
+
+diff --git a/bfd/opncls.c b/bfd/opncls.c
+index 788b034..4e74f7b 100644
+--- a/bfd/opncls.c
++++ b/bfd/opncls.c
+@@ -150,7 +150,14 @@ bfd_openr (const char *filename, const char *target)
+ {
+   bfd *nbfd;
+   const bfd_target *target_vec;
+-
++  struct stat s;
++
++  if (stat (filename, &s) == 0)
++      if (S_ISDIR(s.st_mode)) {
++          bfd_set_error (bfd_error_file_not_recognized);
++          return NULL;
++      }
++  
+   nbfd = _bfd_new_bfd ();
+   if (nbfd == NULL)
+     return NULL;
