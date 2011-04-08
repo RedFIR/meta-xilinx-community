@@ -49,10 +49,6 @@ SRC_URI = "git://developer.petalogix.com/toolchain/glibc.git;protocol=git \
            file://ldsocache-varrun.patch;patchdir=${WORKDIR}/git \
            file://nptl-crosscompile.patch;patchdir=${WORKDIR}/git \
            file://ldd-unbash.patch;patchdir=${WORKDIR}/git \
-           file://generic-bits_select.h;patchdir=${WORKDIR}/git \
-           file://generic-bits_types.h;patchdir=${WORKDIR}/git \
-           file://generic-bits_typesizes.h;patchdir=${WORKDIR}/git \
-           file://generic-bits_time.h;patchdir=${WORKDIR}/git \
            file://etc/ld.so.conf;patchdir=${WORKDIR}/git \
            file://generate-supported.mk;patchdir=${WORKDIR}/git \
            file://zecke-sane-readelf.patch;patchdir=${WORKDIR}/git \
