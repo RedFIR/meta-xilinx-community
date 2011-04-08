@@ -49,7 +49,7 @@ SRC_URI = "${GNU_MIRROR}/gcc/gcc-${PV}/gcc-${PV}.tar.bz2 \
         file://gcc-poison-dir-extend.patch \
         file://gcc-4.3.3-SYSROOT_CFLAGS_FOR_TARGET.patch \
 	    file://64bithack.patch \
-	    file://optional_libstdc.patch \
+        file://optional_libstdc.patch \
 	    file://disable_relax_pic_calls_flag.patch \
 	    file://GPLUSPLUS_INCLUDE_DIR_with_sysroot.patch \
 	    file://COLLECT_GCC_OPTIONS.patch \
@@ -58,11 +58,6 @@ SRC_URI = "${GNU_MIRROR}/gcc/gcc-${PV}/gcc-${PV}.tar.bz2 \
         file://gcc-libgcc-missing-libextra-files.patch \
         file://gcc-libgcc-t-microblaze-extra_parts.patch \
         "
-# Patchs already integrated
-#file://libstdc++-emit-__cxa_end_cleanup-in-text.patch
-#file://arm-bswapsi2.patch
-#file://fedora/gcc43-java-debug-iface-type.patch;striplevel=0
-#file://gcc-poison-parameters.patch
 
 SRC_URI_append_sh3  = " file://sh3-installfix-fixheaders.patch;patch=1 "
 
@@ -81,22 +76,16 @@ EXTRA_OECONF_BASE = " --enable-lto \
 			--disable-bootstrap \
 			--disable-libgomp \
 			--disable-libmudflap \
-			--enable-cheaders=c_global \
-            --disable-libquadmath \
-            --disable-shared"
+			--enable-cheaders=c_global "
 
 EXTRA_OECONF_INITIAL = "--disable-libmudflap \
 			--disable-libgomp \
 			--disable-libssp \
-			--enable-decimal-float=no \
-            --disable-libquadmath \
-            --disable-shared"
+			--enable-decimal-float=no"
 
 EXTRA_OECONF_INTERMEDIATE = "--disable-libmudflap \
 				--disable-libgomp \
-				--disable-libssp \
-                --disable-libquadmath \
-                --disable-shared"
+				--disable-libssp"
 
 EXTRA_OECONF_append_linux-uclibc = " --disable-decimal-float "
 EXTRA_OECONF_append_linux-uclibceabi = " --disable-decimal-float "
