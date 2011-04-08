@@ -1,0 +1,34 @@
+Enabling sysroot support in libtool exposed a bug where the final
+library had an RPATH encoded into it which still pointed to the
+sysroot. This works around the issue until it gets sorted out
+upstream.
+
+Fix suggested by Richard Purdie <richard.purdie@linuxfoundation.org> 
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+
+diff --git a/ltmain.sh b/ltmain.sh
+index 2f4d173..128ed0a 100644
+--- a/ltmain.sh
++++ b/ltmain.sh
+@@ -3039,6 +3039,10 @@ EOF
+ 	  test "$mode" != relink && rpath="$compile_rpath$rpath"
+ 	  for libdir in $rpath; do
+ 	    if test -n "$hardcode_libdir_flag_spec"; then
++          func_replace_sysroot "$libdir"
++          libdir=$func_replace_sysroot_result
++          func_stripname '=' '' "$libdir"
++          libdir=$func_stripname_result
+ 	      if test -n "$hardcode_libdir_separator"; then
+ 		if test -z "$hardcode_libdirs"; then
+ 		  hardcode_libdirs="$libdir"
+@@ -3552,6 +3556,10 @@ EOF
+       hardcode_libdirs=
+       for libdir in $compile_rpath $finalize_rpath; do
+ 	if test -n "$hardcode_libdir_flag_spec"; then
++      func_replace_sysroot "$libdir"
++      libdir=$func_replace_sysroot_result
++      func_stripname '=' '' "$libdir"
++      libdir=$func_stripname_result
+ 	  if test -n "$hardcode_libdir_separator"; then
+ 	    if test -z "$hardcode_libdirs"; then
+ 	      hardcode_libdirs="$libdir"
