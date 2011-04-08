@@ -1,0 +1,250 @@
+Patch originally created by Mark Hatle, forward-ported to
+binutils 2.21 by Scott Garman.
+
+purpose:  warn for uses of system directories when cross linking
+
+Code Merged from Sourcery G++ binutils 2.19 - 4.4-277
+
+2011-04-07 Adrian Alonso <aalonso@secretlab.ca>
+
+    * Rework patch for binutils 2.16.1
+
+2008-07-02  Joseph Myers  <joseph@codesourcery.com>
+
+    ld/
+    * ld.h (args_type): Add error_poison_system_directories.
+    * ld.texinfo (--error-poison-system-directories): Document.
+    * ldfile.c (ldfile_add_library_path): Check
+    command_line.error_poison_system_directories.
+    * ldmain.c (main): Initialize
+    command_line.error_poison_system_directories.
+    * lexsup.c (enum option_values): Add
+    OPTION_ERROR_POISON_SYSTEM_DIRECTORIES.
+    (ld_options): Add --error-poison-system-directories.
+    (parse_args): Handle new option.
+
+2007-06-13  Joseph Myers  <joseph@codesourcery.com>
+
+    ld/
+    * config.in: Regenerate.
+    * ld.h (args_type): Add poison_system_directories.
+    * ld.texinfo (--no-poison-system-directories): Document.
+    * ldfile.c (ldfile_add_library_path): Check
+    command_line.poison_system_directories.
+    * ldmain.c (main): Initialize
+    command_line.poison_system_directories.
+    * lexsup.c (enum option_values): Add
+    OPTION_NO_POISON_SYSTEM_DIRECTORIES.
+    (ld_options): Add --no-poison-system-directories.
+    (parse_args): Handle new option.
+
+2007-04-20  Joseph Myers  <joseph@codesourcery.com>
+
+    Merge from Sourcery G++ binutils 2.17:
+
+    2007-03-20  Joseph Myers  <joseph@codesourcery.com>
+    Based on patch by Mark Hatle <mark.hatle@windriver.com>.
+    ld/
+    * configure.in (--enable-poison-system-directories): New option.
+    * configure, config.in: Regenerate.
+    * ldfile.c (ldfile_add_library_path): If
+    ENABLE_POISON_SYSTEM_DIRECTORIES defined, warn for use of /lib,
+    /usr/lib, /usr/local/lib or /usr/X11R6/lib.
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+Signed-off-by: Scott Garman <scott.a.garman@intel.com>
+Signed-off-by: Adrian Alonso <aalonso@secretlab.ca>
+
+diff --git a/ld/config.in b/ld/config.in
+index 01ec4ff..a297ef8 100644
+--- a/ld/config.in
++++ b/ld/config.in
+@@ -175,3 +175,5 @@
+ /* Additional extension a shared object might have. */
+ #undef EXTRA_SHLIB_EXTENSION
+ 
++/* Define to warn for use of native system library directories */
++#undef ENABLE_POISON_SYSTEM_DIRECTORIES
+diff --git a/ld/configure b/ld/configure
+index d979b24..7368230 100755
+--- a/ld/configure
++++ b/ld/configure
+@@ -858,6 +858,8 @@ Optional Features:
+   --disable-libtool-lock  avoid locking (might break parallel builds)
+   --enable-targets        alternative target configurations
+   --enable-64-bit-bfd     64-bit support (on hosts with narrower word sizes)
++  --enable-poison-system-directories
++                          warn for use of native system library directories
+   --enable-build-warnings enable build-time compiler warnings if gcc is used
+   --disable-nls           do not use Native Language Support
+   --enable-maintainer-mode  enable make rules and dependencies not useful
+@@ -4121,8 +4123,18 @@ else
+ 
+ fi;
+ 
++# Check whether --enable-poison-system-directories was given.
++if test "${enable_poison_system_directories+set}" = set; then :
++  enableval=$enable_poison_system_directories;
++else
++  enable_poison_system_directories=no
++fi
+ 
++if test "x${enable_poison_system_directories}" = "xyes"; then
+ 
++$as_echo "#define ENABLE_POISON_SYSTEM_DIRECTORIES 1" >>confdefs.h
++
++fi
+ 
+ build_warnings="-W -Wall -Wstrict-prototypes -Wmissing-prototypes"
+ # Check whether --enable-build-warnings or --disable-build-warnings was given.
+diff --git a/ld/configure.in b/ld/configure.in
+index 8b8354d..6530ccb 100644
+--- a/ld/configure.in
++++ b/ld/configure.in
+@@ -66,6 +66,16 @@ AC_SUBST(use_sysroot)
+ AC_SUBST(TARGET_SYSTEM_ROOT)
+ AC_SUBST(TARGET_SYSTEM_ROOT_DEFINE)
+ 
++AC_ARG_ENABLE([poison-system-directories],
++         AS_HELP_STRING([--enable-poison-system-directories],
++                [warn for use of native system library directories]),,
++         [enable_poison_system_directories=no])
++if test "x${enable_poison_system_directories}" = "xyes"; then
++  AC_DEFINE([ENABLE_POISON_SYSTEM_DIRECTORIES],
++       [1],
++       [Define to warn for use of native system library directories])
++fi
++
+ build_warnings="-W -Wall -Wstrict-prototypes -Wmissing-prototypes"
+ AC_ARG_ENABLE(build-warnings,
+ [  --enable-build-warnings enable build-time compiler warnings if gcc is used],
+diff --git a/ld/ld.h b/ld/ld.h
+index 58be0e5..785a24a 100644
+--- a/ld/ld.h
++++ b/ld/ld.h
+@@ -172,6 +172,14 @@ typedef struct {
+      This will cause map file generation to use an O(N^2) algorithm.  */
+   bfd_boolean reduce_memory_overheads;
+ 
++  /* If TRUE (the default) warn for uses of system directories when
++     cross linking.  */
++  bfd_boolean poison_system_directories;
++
++  /* If TRUE (default FALSE) give an error for uses of system
++     directories when cross linking instead of a warning.  */
++  bfd_boolean error_poison_system_directories;
++
+ } args_type;
+ 
+ extern args_type command_line;
+diff --git a/ld/ld.texinfo b/ld/ld.texinfo
+index 29f637f..e2fd9b9 100644
+--- a/ld/ld.texinfo
++++ b/ld/ld.texinfo
+@@ -1817,6 +1817,17 @@ has been used.
+ The @option{--reduce-memory-overheads} switch may be also be used to
+ enable other tradeoffs in future versions of the linker.
+ 
++@kindex --no-poison-system-directories
++@item --no-poison-system-directories
++Do not warn for @option{-L} options using system directories such as
++@file{/usr/lib} when cross linking.  This option is intended for use
++in chroot environments when such directories contain the correct
++libraries for the target system rather than the host.
++
++@kindex --error-poison-system-directories
++@item --error-poison-system-directories
++Give an error instead of a warning for @option{-L} options using
++system directories when cross linking.
+ @end table
+ 
+ @c man end
+diff --git a/ld/ldfile.c b/ld/ldfile.c
+index 372f79e..fcf673c 100644
+--- a/ld/ldfile.c
++++ b/ld/ldfile.c
+@@ -122,6 +122,23 @@ ldfile_add_library_path (const char *name, bfd_boolean cmdline)
+     {
+       new->name = xstrdup (name);
+       new->sysrooted = is_sysrooted_pathname (name, FALSE);
++
++#ifdef ENABLE_POISON_SYSTEM_DIRECTORIES
++    if (command_line.poison_system_directories
++        && ((!strncmp (name, "/lib", 4))
++        || (!strncmp (name, "/usr/lib", 8))
++        || (!strncmp (name, "/usr/local/lib", 14))
++        || (!strncmp (name, "/usr/X11R6/lib", 14))))
++    {
++         if (command_line.error_poison_system_directories)
++             einfo (_("%X%P: error: library search path \"%s\" is unsafe for "
++                "cross-compilation\n"), name);
++        else
++            einfo (_("%P: warning: library search path \"%s\" is unsafe for "
++                "cross-compilation\n"), name);
++    }
++#endif
++
+     }
+ }
+ 
+diff --git a/ld/ldmain.c b/ld/ldmain.c
+index 82d88dd..4827d4a 100644
+--- a/ld/ldmain.c
++++ b/ld/ldmain.c
+@@ -257,6 +257,8 @@ main (int argc, char **argv)
+   command_line.check_section_addresses = TRUE;
+   command_line.accept_unknown_input_arch = FALSE;
+   command_line.reduce_memory_overheads = FALSE;
++  command_line.poison_system_directories = TRUE;
++  command_line.error_poison_system_directories = FALSE;
+ 
+   sort_section = none;
+ 
+diff --git a/ld/lexsup.c b/ld/lexsup.c
+index b18b1e2..0c67783 100644
+--- a/ld/lexsup.c
++++ b/ld/lexsup.c
+@@ -152,7 +152,9 @@ enum option_values
+   OPTION_WARN_UNRESOLVED_SYMBOLS,
+   OPTION_ERROR_UNRESOLVED_SYMBOLS,
+   OPTION_WARN_SHARED_TEXTREL,
+-  OPTION_REDUCE_MEMORY_OVERHEADS
++  OPTION_REDUCE_MEMORY_OVERHEADS,
++  OPTION_NO_POISON_SYSTEM_DIRECTORIES,
++  OPTION_ERROR_POISON_SYSTEM_DIRECTORIES
+ };
+ 
+ /* The long options.  This structure is used for both the option
+@@ -518,6 +520,14 @@ static const struct ld_option ld_options[] =
+     TWO_DASHES },
+   { {"wrap", required_argument, NULL, OPTION_WRAP},
+     '\0', N_("SYMBOL"), N_("Use wrapper functions for SYMBOL"), TWO_DASHES },
++  { {"no-poison-system-directories", no_argument, NULL,
++    OPTION_NO_POISON_SYSTEM_DIRECTORIES},
++    '\0', NULL, N_("Do not warn for -L options using system directories"),
++    TWO_DASHES },
++  { {"error-poison-system-directories", no_argument, NULL,
++    OPTION_ERROR_POISON_SYSTEM_DIRECTORIES},
++    '\0', NULL, N_("Give an error for -L options using system directories"),
++    TWO_DASHES },
+ };
+ 
+ #define OPTION_COUNT ARRAY_SIZE (ld_options)
+@@ -1344,6 +1354,14 @@ parse_args (unsigned argc, char **argv)
+               einfo (_("%P%X: --hash-size needs a numeric argument\n"));
+           }
+           break;
++
++        case OPTION_NO_POISON_SYSTEM_DIRECTORIES:
++            command_line.poison_system_directories = FALSE;
++            break;
++
++        case OPTION_ERROR_POISON_SYSTEM_DIRECTORIES:
++            command_line.error_poison_system_directories = TRUE;
++            break;
+ 	}
+     }
+ 
+-- 
+1.7.4.2
+
