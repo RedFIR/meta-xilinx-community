@@ -1,0 +1,170 @@
+From 48f9dd8ba045e2739d7aec813071386e278cc58b Mon Sep 17 00:00:00 2001
+From: Adrian Alonso <aalonso00@gmail.com>
+Date: Wed, 26 May 2010 19:25:23 -0500
+Subject: [PATCH] zecke sane readelf
+
+* Reformat sane readelf for glibc-2.3.6
+
+Signed-off-by: Adrian Alonso <aalonso00@gmail.com>
+---
+ configure    |   93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ configure.in |    8 +++--
+ 2 files changed, 95 insertions(+), 6 deletions(-)
+
+Index: git/configure
+===================================================================
+--- git.orig/configure
++++ git/configure
+@@ -4811,7 +4811,94 @@ if test $libc_cv_signed_size_t = yes; th
+ EOF
+ fi
+ 
++### XXXX copy and pasted
++# Check for readelf
++# Extract the first word of "$target_alias-readelf", so it can be a program name with args.
++set dummy $target_alias-readelf; ac_word=$2
++{ echo "$as_me:$LINENO: checking for $ac_word" >&5
++echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
++if test "${ac_cv_prog_READELF+set}" = set; then
++  echo $ECHO_N "(cached) $ECHO_C" >&6
++else
++  if test -n "$READELF"; then
++  ac_cv_prog_READELF="$READELF" # Let the user override the test.
++else
++as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
++for as_dir in $PATH
++do
++  IFS=$as_save_IFS
++  test -z "$as_dir" && as_dir=.
++  for ac_exec_ext in '' $ac_executable_extensions; do
++  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; }; then
++    ac_cv_prog_READELF="$target_alias-readelf"
++    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
++    break 2
++  fi
++done
++done
++IFS=$as_save_IFS
++
++fi
++fi
++READELF=$ac_cv_prog_READELF
++if test -n "$READELF"; then
++  { echo "$as_me:$LINENO: result: $READELF" >&5
++echo "${ECHO_T}$READELF" >&6; }
++else
++  { echo "$as_me:$LINENO: result: no" >&5
++echo "${ECHO_T}no" >&6; }
++fi
++
++
++if test -z "$ac_cv_prog_READELF"; then
++  if test "$build" = "$target"; then
++    ac_ct_READELF=$READELF
++    # Extract the first word of "readelf", so it can be a program name with args.
++set dummy readelf; ac_word=$2
++{ echo "$as_me:$LINENO: checking for $ac_word" >&5
++echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
++if test "${ac_cv_prog_ac_ct_READELF+set}" = set; then
++  echo $ECHO_N "(cached) $ECHO_C" >&6
++else
++  if test -n "$ac_ct_READELF"; then
++  ac_cv_prog_ac_ct_READELF="$ac_ct_READELF" # Let the user override the test.
++else
++as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
++for as_dir in $PATH
++do
++  IFS=$as_save_IFS
++  test -z "$as_dir" && as_dir=.
++  for ac_exec_ext in '' $ac_executable_extensions; do
++  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; }; then
++    ac_cv_prog_ac_ct_READELF="readelf"
++    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
++    break 2
++  fi
++done
++done
++IFS=$as_save_IFS
++
++  test -z "$ac_cv_prog_ac_ct_READELF" && ac_cv_prog_ac_ct_READELF="readelf"
++fi
++fi
++ac_ct_READELF=$ac_cv_prog_ac_ct_READELF
++if test -n "$ac_ct_READELF"; then
++  { echo "$as_me:$LINENO: result: $ac_ct_READELF" >&5
++echo "${ECHO_T}$ac_ct_READELF" >&6; }
++else
++  { echo "$as_me:$LINENO: result: no" >&5
++echo "${ECHO_T}no" >&6; }
++fi
++
++    READELF=ac_ct_READELF
++  else
++    READELF="readelf"
++  fi
++else
++  READELF="$ac_cv_prog_READELF"
++fi
+ 
++### XXXX copy and pasted
+ echo "$as_me:$LINENO: checking for libc-friendly stddef.h" >&5
+ echo $ECHO_N "checking for libc-friendly stddef.h... $ECHO_C" >&6
+ if test "${libc_cv_friendly_stddef+set}" = set; then
+@@ -5375,7 +5462,7 @@ EOF
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }; }
+   then
+-    if readelf -S conftest | fgrep INIT_ARRAY > /dev/null; then
++    if $READELF -S conftest | fgrep INIT_ARRAY > /dev/null; then
+       libc_cv_initfinit_array=yes
+     else
+       libc_cv_initfinit_array=no
+@@ -5671,7 +5758,7 @@ EOF
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }; }
+   then
+-    if readelf -S conftest.so | grep '\.rel\(a\|\)\.dyn' > /dev/null; then
++    if $READELF -S conftest.so | grep '\.rel\(a\|\)\.dyn' > /dev/null; then
+       libc_cv_z_combreloc=yes
+     else
+       libc_cv_z_combreloc=no
+Index: git/configure.in
+===================================================================
+--- git.orig/configure.in
++++ git/configure.in
+@@ -1234,6 +1234,8 @@ EOF
+     fi
+   fi
+ 
++  AC_CHECK_TARGET_TOOL([READELF],[readelf],[readelf],[$PATH])
++
+   AC_CACHE_CHECK(for .preinit_array/.init_array/.fini_array support,
+ 		 libc_cv_initfinit_array, [dnl
+   cat > conftest.c <<EOF
+@@ -1245,7 +1247,7 @@ EOF
+   if AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest conftest.c
+ 		     -static -nostartfiles -nostdlib 1>&AS_MESSAGE_LOG_FD])
+   then
+-    if readelf -S conftest | fgrep INIT_ARRAY > /dev/null; then
++    if $READELF -S conftest | fgrep INIT_ARRAY > /dev/null; then
+       libc_cv_initfinit_array=yes
+     else
+       libc_cv_initfinit_array=no
+@@ -1428,7 +1430,7 @@ dnl cross-platform since the gcc used ca
+ dnl introducing new options this is not easily doable.  Instead use a tool
+ dnl which always is cross-platform: readelf.  To detect whether -z combreloc
+ dnl look for a section named .rel.dyn.
+-    if readelf -S conftest.so | grep '\.rel\(a\|\)\.dyn' > /dev/null; then
++    if $READELF -S conftest.so | grep '\.rel\(a\|\)\.dyn' > /dev/null; then
+       libc_cv_z_combreloc=yes
+     else
+       libc_cv_z_combreloc=no
+@@ -1662,7 +1664,7 @@ foo:
+ EOF
+ if AC_TRY_COMMAND([${CC-cc} $CPPFLAGS $ASFLAGS -g -c conftest.S 1>&AS_MESSAGE_LOG_FD]) && {
+    ac_pattern='conftest\.S'
+-   AC_TRY_COMMAND([objdump --dwarf=rawline conftest.o |
++   AC_TRY_COMMAND([$READELF --debug-dump=line conftest.o |
+ 		   grep $ac_pattern 1>&AS_MESSAGE_LOG_FD])
+   }; then
+   libc_cv_cpp_asm_debuginfo=yes
