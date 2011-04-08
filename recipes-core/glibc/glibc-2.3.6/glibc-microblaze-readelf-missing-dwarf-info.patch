@@ -1,0 +1,45 @@
+From d1d599ef369ad6102166393e32394069ba0c39a3 Mon Sep 17 00:00:00 2001
+From: Adrian Alonso <aalonso00@gmail.com>
+Date: Mon, 14 Jun 2010 12:41:23 -0500
+Subject: [PATCH] glibc: microblaze readelf missing dwarf info
+
+* Workaround used objdump instead of readelf
+  readelf: Error: Missing knowledge of 32-bit reloc types
+  used in DWARF sections of machine number 189
+* Replace readelf for objdump to pass configure test
+
+Signed-off-by: Adrian Alonso <aalonso00@gmail.com>
+---
+ configure               |    2 +-
+ configure.in            |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 685d6c2..5a45ef6 100755
+--- a/configure
++++ b/configure
+@@ -6115,7 +6115,7 @@ if { ac_try='${CC-cc} $CPPFLAGS $ASFLAGS -g -c conftest.S 1>&5'
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }; } && {
+    ac_pattern='conftest\.S'
+-   { ac_try='readelf --debug-dump=line conftest.o |
++   { ac_try='objdump --dwarf=rawline conftest.o |
+ 		   grep $ac_pattern 1>&5'
+   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+   (eval $ac_try) 2>&5
+diff --git a/configure.in b/configure.in
+index ab4975e..d1a8e80 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1662,7 +1662,7 @@ foo:
+ EOF
+ if AC_TRY_COMMAND([${CC-cc} $CPPFLAGS $ASFLAGS -g -c conftest.S 1>&AS_MESSAGE_LOG_FD]) && {
+    ac_pattern='conftest\.S'
+-   AC_TRY_COMMAND([readelf --debug-dump=line conftest.o |
++   AC_TRY_COMMAND([objdump --dwarf=rawline conftest.o |
+ 		   grep $ac_pattern 1>&AS_MESSAGE_LOG_FD])
+   }; then
+   libc_cv_cpp_asm_debuginfo=yes
+-- 
+1.7.0.1
+
