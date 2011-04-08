@@ -1,0 +1,43 @@
+From f085ea626341f0e1903d6de7d0fa97bdd882c422 Mon Sep 17 00:00:00 2001
+From: Adrian Alonso <aalonso@secretlab.ca>
+Date: Thu, 7 Apr 2011 11:32:31 -0500
+Subject: [PATCH] binutils uclibc 300 001 ld makefile patch
+
+* 001_ld_makefile_patch.dpatch
+* Rework patch
+
+Signed-off-by: Adrian Alonso <aalonso@secretlab.ca>
+---
+ ld/Makefile.am |    2 +-
+ ld/Makefile.in |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index 6f8e3b7..4b5baa5 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -19,7 +19,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
+ # We put the scripts in the directory $(scriptdir)/ldscripts.
+ # We can't put the scripts in $(datadir) because the SEARCH_DIR
+ # directives need to be different for native and cross linkers.
+-scriptdir = $(tooldir)/lib
++scriptdir = $(libdir)
+ 
+ EMUL = @EMUL@
+ EMULATION_OFILES = @EMULATION_OFILES@
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index 8e8d566..c58f1a1 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -139,7 +139,7 @@ AM_CFLAGS = $(WARN_CFLAGS)
+ # We put the scripts in the directory $(scriptdir)/ldscripts.
+ # We can't put the scripts in $(datadir) because the SEARCH_DIR
+ # directives need to be different for native and cross linkers.
+-scriptdir = $(tooldir)/lib
++scriptdir = $(libdir)
+ 
+ EMUL = @EMUL@
+ EMULATION_OFILES = @EMULATION_OFILES@
+-- 
+1.7.4.2
+
