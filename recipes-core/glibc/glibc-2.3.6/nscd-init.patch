@@ -1,0 +1,39 @@
+Index: nscd/nscd.init
+===================================================================
+--- nscd/nscd.init.orig
++++ nscd/nscd.init
+@@ -47,7 +47,7 @@ start () {
+ #   	fi
+ #   done
+     echo -n $"Starting $prog: "
+-    daemon /usr/sbin/nscd $secure
++    /usr/sbin/nscd $secure
+     RETVAL=$?
+     echo
+     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/nscd
+@@ -64,12 +64,10 @@ stop () {
+ 	# a non-privileged user
+ 	rm -f /var/run/nscd/nscd.pid
+ 	rm -f /var/run/nscd/socket
+-       	success $"$prog shutdown"
+-    else
+-       	failure $"$prog shutdown"
+     fi
+-    echo
+-    return $RETVAL
++    echo "Done."
++    # If nscd did not run, return 0 according to LSB.
++    return 0
+ }
+ 
+ restart() {
+@@ -101,7 +99,8 @@ case "$1" in
+ 	;;
+     reload)
+     	echo -n $"Reloading $prog: "
+-	killproc /usr/sbin/nscd -HUP
++	# Use killall, initscripts-1.0-r115 don't support -HUP yet.
++	killall -HUP /usr/sbin/nscd
+ 	RETVAL=$?
+ 	echo
+ 	;;
