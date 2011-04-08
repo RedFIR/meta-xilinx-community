@@ -1,0 +1,21 @@
+don't let the distro compiler point to the wrong installation location
+
+Thanks to RP for helping find the source code causing the issue.
+
+2010/08/13
+Nitin A Kamble <nitin.a.kamble@intel.com>
+
+diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
+index 2dc4e7a..ce373b5 100644
+--- a/libiberty/Makefile.in
++++ b/libiberty/Makefile.in
+@@ -293,7 +293,8 @@ install_to_libdir: all
+ # multilib-specific flags, it's overridden by FLAGS_TO_PASS from the
+ # default multilib, so we have to take LIBCFLAGS into account as well,
+ # since it will be passed the multilib flags.
+-MULTIOSDIR = `$(CC) $(LIBCFLAGS) -print-multi-os-directory`
++# MULTIOSDIR = `$(CC) $(LIBCFLAGS) -print-multi-os-directory`
++MULTIOSDIR = ""
+ install_to_tooldir: all
+ 	${mkinstalldirs} $(DESTDIR)$(tooldir)/lib/$(MULTIOSDIR)
+ 	$(INSTALL_DATA) $(TARGETLIB) $(DESTDIR)$(tooldir)/lib/$(MULTIOSDIR)/$(TARGETLIB)n
