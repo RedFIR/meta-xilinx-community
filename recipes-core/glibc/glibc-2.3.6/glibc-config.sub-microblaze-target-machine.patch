@@ -1,0 +1,27 @@
+From d21a132e84d795ab5feae55b09bbf094287614e2 Mon Sep 17 00:00:00 2001
+From: Adrian Alonso <aalonso@secretlab.ca>
+Date: Mon, 4 Apr 2011 19:22:47 -0500
+Subject: [PATCH] glibc: config.sub microblaze target machine
+
+Signed-off-by: Adrian Alonso <aalonso@secretlab.ca>
+---
+ scripts/config.sub |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/config.sub b/scripts/config.sub
+index 949eba3..d3ffd9d 100755
+--- a/scripts/config.sub
++++ b/scripts/config.sub
+@@ -628,6 +628,9 @@ case $basic_machine in
+ 		basic_machine=ns32k-utek
+ 		os=-sysv
+ 		;;
++    microblaze*)
++        basic_machine=microblaze-xilinx
++        ;;
+ 	mingw32)
+ 		basic_machine=i386-pc
+ 		os=-mingw32
+-- 
+1.7.4
+
